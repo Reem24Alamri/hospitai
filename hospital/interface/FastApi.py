@@ -8,15 +8,7 @@ from sklearn.model_selection import train_test_split
 import pickle
 app = FastAPI()
 
-def load_model():
-    with open('/home/reema/code/Reem24Alamri/hospitai/knn_model.pkl', 'rb') as file:
-        loaded_model = pickle.load(file)
-
-    return loaded_model
-
-
 app.state.model = load_model()
-
 
 # class Item(BaseModel):
 #     Gender: int
@@ -52,68 +44,108 @@ def read_item(Gender: str, AGE: int, SMOKING: str, HEART_FAILURE: str,
               AKI: str, CVA_INFRACT: str, CARDIOGENIC_SHOCK: str,
               PULMONARY_EMBOLISM: str, TYPE_OF_ADMISSION: str,
                DM: str, HTN: str, SEVERE_ANAEMIA: str):
-    if Gender == 'M':
-        Gender = 'Male'
-    else:
-        Gender = 'Female'
 
-    if SMOKING == 'Yes':
-        SMOKING = '1'
-    else:
-        SMOKING = '0'
+    conversion_dict = {
+        'SMOKING ': {'YES': 1, 'NO': 0},
+        'ALCOHOL': {'YES': 1, 'NO': 0},
+        'DM': {'YES': 1, 'NO': 0},
+        'HTN': {'YES': 1, 'NO': 0},
+        'CAD': {'YES': 1, 'NO': 0},
+        'PRIOR_CMP': {'YES': 1, 'NO': 0},
+        'CKD': {'YES': 1, 'NO': 0},
+        'RAISED_CARDIAC_ENZYMES': {'YES': 1, 'NO': 0},
+        'SEVERE_ANAEMIA': {'YES': 1, 'NO': 0},
+        'ANAEMIA': {'YES': 1, 'NO': 0},
+        'STABLE_ANGINA': {'YES': 1, 'NO': 0},
+        'ACS': {'YES': 1, 'NO': 0},
+        'STEMI': {'YES': 1, 'NO': 0},
+        'ATYPICAL_CHEST_PAIN': {'YES': 1, 'NO': 0},
+        'HEART_FAILURE': {'YES': 1, 'NO': 0},
+        'HFREF': {'YES': 1, 'NO': 0},
+        'HFNEF': {'YES': 1, 'NO': 0},
+        'VALVULAR': {'YES': 1, 'NO': 0},
+        'CHB': {'YES': 1, 'NO': 0},
+        'SSS': {'YES': 1, 'NO': 0},
+        'AKI': {'YES': 1, 'NO': 0},
+        'CVA_INFRACT': {'YES': 1, 'NO': 0},
+        'CVA_BLEED': {'YES': 1, 'NO': 0},
+        'AF': {'YES': 1, 'NO': 0},
+        'VT': {'YES': 1, 'NO': 0},
+        'PSVT': {'YES': 1, 'NO': 0},
+        'CONGENITAL': {'YES': 1, 'NO': 0},
+        'UTI': {'YES': 1, 'NO': 0},
+        'NEURO_ARDIOGENIC_SYNCOPE': {'YES': 1, 'NO': 0},
+        'ORTHOSTATIC': {'YES': 1, 'NO': 0},
+        'INFECTIVE_ENDOCARDITIS': {'YES': 1, 'NO': 0},
+        'DVT': {'YES': 1, 'NO': 0},
+        'CARDIOGENIC_SHOCK': {'YES': 1, 'NO': 0},
+        'SHOCK': {'YES': 1, 'NO': 0},
+        'PULMONARY_EMBOLISM': {'YES': 1, 'NO': 0},
+        'CHEST_INFECTION': {'YES': 1, 'NO': 0},
+        'GENDER': {'MALE': 'M', 'FEMALE': 'F'},
+        'RURAL': {'RURAL': 'R', 'URBAN': 'U'},
+        'TYPE_OF_ADMISSION' : {'EMERGENCY':'E', 'OPD': 'O'}
+    }
+    columns = [
+        'SMOKING ', 'ALCOHOL', 'DM', 'HTN', 'CAD', 'PRIOR CMP', 'CKD',
+        'RAISED_ARDIAC_ENZYMES', 'SEVERE_ANAEMIA', 'ANAEMIA', 'STABLE_ANGINA',
+        'ACS', 'STEMI', 'ATYPICAL_CHEST_PAIN', 'HEART_FAILURE', 'HFREF', 'HFNEF',
+        'VALVULAR', 'CHB', 'SSS', 'AKI', 'CVA_INFRACT', 'CVA_BLEED', 'AF', 'VT',
+        'PSVT', 'CONGENITAL', 'UTI', 'NEURO_CARDIOGENIC_SYNCOPE', 'ORTHOSTATIC',
+        'INFECTIVE_ENDOCARDITIS', 'DVT', 'CARDIOGENIC_SHOCK', 'SHOCK',
+        'PULMONARY_EMBOLISM', 'CHEST_INFECTION', 'GENDER', 'RURAL','TYPE_OF_ADMISSION'
+    ]
+    user_input = {}
+    for column in columns:
+        while True:
+            response = input(f"Enter value for {column} (Options: {', '.join(conversion_dict[column].keys())}): ").strip().upper()
+            if response in conversion_dict[column]:
+                user_input[column] = conversion_dict[column][response]
+                break
+            else:
+                print(f"Invalid input. Please enter one of the following options: {', '.join(conversion_dict[column].keys())}")
 
-    if  TYPE_OF_ADMISSION == 'Emergency ':
-        TYPE_OF_ADMISSION = 'E'
-    else:
-        TYPE_OF_ADMISSION = 'O'
+    for key, value in user_input.items():
+        print(f"{key}: {value}")
 
-    if  HEART_FAILURE == 'Yes':
-        HEART_FAILURE = '1'
-    else:
-        HEART_FAILURE = '0'
+    additional_values = {
+        'ALCOHOL': 0,
+        'CAD': 1,
+        'PRIOR_CMP': 0,
+        'CKD': 0,
+        'RAISED_CARDIAC_ENZYMES': 0,
+        'ANAEMIA': 0,
+        'STABLE_ANGINA': 0,
+        'ACS': 0,
+        'STEMI': 0,
+        'ATYPICAL_CHEST_PAIN': 0,
+        'HFREF': 0,
+        'HB': 12.6,
+        'TLC': 8.4,
+        'PLATELETS': 150,
+        'GLUCOSE': 110,
+        'UREA': 27,
+        'CREATININE': 0.8,
+        'EF': 60,
+        'RURAL': 'U',
+        'DURATION_OF_STAY': 2,
+        'HFNEF': 0,
+        'VALVULAR': 0,
+        'CHB': 0,
+        'SSS': 0,
+        'CVA_BLEED': 0,
+        'AF': 0,
+        'VT': 0,
+        'PSVT': 0,
+        'CONGENITAL': 0,
+        'UTI': 0,
+        'NEURO_CARDIOGENIC_SYNCOPE': 0,
+        'ORTHOSTATIC': 0,
+        'INFECTIVE_ENDOCARDITIS': 0,
+        'DVT': 0,
+        'SHOCK': 0
+    }
 
-    if  AKI  == 'Yes':
-        AKI  = '1'
-    else:
-        AKI  = '0'
-    if  CVA_INFRACT  == 'Yes':
-        CVA_INFRACT  = '1'
-    else:
-        CVA_INFRACT  = '0'
-
-    if  CARDIOGENIC_SHOCK  == 'Yes':
-        CARDIOGENIC_SHOCK  = '1'
-    else:
-        CARDIOGENIC_SHOCK  = '0'
-
-    if  PULMONARY_EMBOLISM == 'Yes':
-        PULMONARY_EMBOLISM = '1'
-    else:
-        PULMONARY_EMBOLISM = '0'
-
-    if  DM == 'Yes':
-        DM = '1'
-    else:
-        DM = '0'
-
-    if  HTN == 'Yes':
-        HTN = '1'
-    else:
-        HTN = '0'
-
-    if  SEVERE_ANAEMIA == 'Yes':
-        SEVERE_ANAEMIA = '1'
-    else:
-        SEVERE_ANAEMIA = '0'
-
-
-
-    summary = (
-        f"Gender: {Gender}, AGE: {AGE}, SMOKING: {SMOKING}, HEART_FAILURE: {HEART_FAILURE}, "
-        f"AKI: {AKI}, CVA_INFRACT: {CVA_INFRACT}, CARDIOGENIC_SHOCK: {CARDIOGENIC_SHOCK}, "
-        f"PULMONARY_EMBOLISM: {PULMONARY_EMBOLISM}, TYPE_OF_ADMISSION: {TYPE_OF_ADMISSION}, "
-        f"DM: {DM}, HTN: {HTN}, SEVERE_ANAEMIA: {SEVERE_ANAEMIA}"
-    )
 
     # preprocessing the input
     # X_proc = sk_learn_proc(X)[0]

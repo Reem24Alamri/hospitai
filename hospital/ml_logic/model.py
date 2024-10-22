@@ -21,7 +21,7 @@ def evaluate_model(model, X, y):
     y_pred = model.predict(X)
     mae = mean_absolute_error(y, y_pred)
 
-    return print(f'Mean Absolute Error (MAE): {mae}')
+    return mae
 
 def save_model(model, filename='trained_model.pkl'):
     with open(filename, 'wb') as file:
