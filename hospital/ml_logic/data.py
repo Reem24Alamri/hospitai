@@ -8,16 +8,16 @@ def get_data():
     root_dir = os.path.dirname(os.path.dirname(__file__))
     csv_path = os.path.join(root_dir, "..", "raw_data", )
 
-    df = pd.read_csv(os.path.join(csv_path, 'HDHI Admission data.csv'))
+    df = pd.read_csv(os.path.join(csv_path, 'HDHI-Admission-data.csv'))
 
     return df
 
 # Data Cleaning
 def get_data_cleaned():
     root_dir = os.path.dirname(os.path.dirname(__file__))
-    csv_path = os.path.join(root_dir, "..", "raw_data")
+    csv_path = os.path.join(root_dir, "..", "data", "raw_data")
 
-    df = pd.read_csv(os.path.join(csv_path, 'HDHI Admission data.csv'))
+    df = pd.read_csv(os.path.join(csv_path, 'HDHI-Admission-data.csv'))
 
     # drop columns pt1
     df.drop(columns=[
