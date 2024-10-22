@@ -8,15 +8,7 @@ from sklearn.model_selection import train_test_split
 import pickle
 app = FastAPI()
 
-def load_model():
-    with open('/home/reema/code/Reem24Alamri/hospitai/knn_model.pkl', 'rb') as file:
-        loaded_model = pickle.load(file)
-
-    return loaded_model
-
-
 app.state.model = load_model()
-
 
 # class Item(BaseModel):
 #     Gender: int
@@ -115,6 +107,44 @@ def read_item(Gender: str, AGE: int, SMOKING: str, HEART_FAILURE: str,
 
     for key, value in user_input.items():
         print(f"{key}: {value}")
+
+    additional_values = {
+        'ALCOHOL': 0,
+        'CAD': 1,
+        'PRIOR_CMP': 0,
+        'CKD': 0,
+        'RAISED_CARDIAC_ENZYMES': 0,
+        'ANAEMIA': 0,
+        'STABLE_ANGINA': 0,
+        'ACS': 0,
+        'STEMI': 0,
+        'ATYPICAL_CHEST_PAIN': 0,
+        'HFREF': 0,
+        'HB': 12.6,
+        'TLC': 8.4,
+        'PLATELETS': 150,
+        'GLUCOSE': 110,
+        'UREA': 27,
+        'CREATININE': 0.8,
+        'EF': 60,
+        'RURAL': 'U',
+        'DURATION_OF_STAY': 2,
+        'HFNEF': 0,
+        'VALVULAR': 0,
+        'CHB': 0,
+        'SSS': 0,
+        'CVA_BLEED': 0,
+        'AF': 0,
+        'VT': 0,
+        'PSVT': 0,
+        'CONGENITAL': 0,
+        'UTI': 0,
+        'NEURO_CARDIOGENIC_SYNCOPE': 0,
+        'ORTHOSTATIC': 0,
+        'INFECTIVE_ENDOCARDITIS': 0,
+        'DVT': 0,
+        'SHOCK': 0
+    }
 
 
     # preprocessing the input
