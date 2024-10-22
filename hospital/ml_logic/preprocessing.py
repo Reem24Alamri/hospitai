@@ -9,10 +9,28 @@ from sklearn.model_selection import cross_validate, cross_val_score,train_test_s
 
 
 
-def sk_learn_proc(df: pd.DataFrame):
+def sk_learn_proc(X: pd.DataFrame):
 
-    X = df.drop(columns='DURATION OF STAY')
-    y = df['DURATION OF STAY']
+    # creation of sin and cos features
+    # month_dict = {
+    #     'Jan':1,
+    #     'Feb':2,
+    #     'Mar':3,
+    #     'Apr':4,
+    #     'May':5,
+    #     'Jun':6,
+    #     'Jul':7,
+    #     'Aug':8,
+    #     'Sep':9,
+    #     'Oct':10,
+    #     'Nov':11,
+    #     'Dec':12
+    # }
+    # X['month_nb'] = X['month year'].apply(lambda x: month_dict[x[:3]])
+    # months_in_a_year = 12
+    # X['sin_admission'] = np.sin(2 * np.pi * (X['month_nb'] - 1) / months_in_a_year)
+    # X['cos_admission'] = np.cos(2 * np.pi * (X['month_nb'] - 1) / months_in_a_year)
+    # X.drop(columns=['month year', 'month_nb'], inplace=True)
 
     num_transformer = RobustScaler()
     cat_transformer = OneHotEncoder(drop='if_binary', sparse_output=False)
@@ -22,6 +40,17 @@ def sk_learn_proc(df: pd.DataFrame):
         ('cat_transformer', cat_transformer, ['GENDER', 'RURAL', 'TYPE OF ADMISSION-EMERGENCY/OPD'])],
         remainder='passthrough')
 
-    X_proc = pd.DataFrame(preprocessor.fit_transform(X), columns=list(X.columns))
+    X_proc = preprocessor.fit_transform(X)
+    cleaned_column_names = [name.split('__')[-1] for name in preprocessor.get_feature_names_out()]
 
-    return (X_proc,y)
+    X_proc = pd.DataFrame(X_proc, columns=cleaned_column_names)
+    X_proc.rename(
+        columns={
+            'GENDER_M':'GENDER',
+            'RURAL_U':'RURAL',
+            'TYPE OF ADMISSION-EMERGENCY/OPD_O':'TYPE OF ADMISSION-EMERGENCY/OPD'
+        },
+        inplace=True
+    )
+
+    return X_proc

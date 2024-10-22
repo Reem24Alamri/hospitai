@@ -6,6 +6,8 @@ from hospital.ml_logic.registry import load_model
 from hospital.ml_logic.model import evaluate_model
 from sklearn.model_selection import train_test_split
 import pickle
+import pandas as pd
+
 app = FastAPI()
 
 app.state.model = load_model()
@@ -40,85 +42,70 @@ def testing():
     return {"MAE":f"{mae}"}
 
 @app.get("/predict")
-def read_item(Gender: str, AGE: int, SMOKING: str, HEART_FAILURE: str,
-              AKI: str, CVA_INFRACT: str, CARDIOGENIC_SHOCK: str,
-              PULMONARY_EMBOLISM: str, TYPE_OF_ADMISSION: str,
-               DM: str, HTN: str, SEVERE_ANAEMIA: str):
+# def read_item(Gender: str, AGE: int, SMOKING: str, HEART_FAILURE: str,
+#               AKI: str, CVA_INFRACT: str, CARDIOGENIC_SHOCK: str,
+#               PULMONARY_EMBOLISM: str, TYPE_OF_ADMISSION: str,
+#                DM: str, HTN: str, SEVERE_ANAEMIA: str):
+def read_item():
 
     conversion_dict = {
+        'GENDER': {'MALE': 'M', 'FEMALE': 'F'},
         'SMOKING ': {'YES': 1, 'NO': 0},
-        'ALCOHOL': {'YES': 1, 'NO': 0},
+        'HEART FAILURE': {'YES': 1, 'NO': 0},
+        'AKI': {'YES': 1, 'NO': 0},
+        'CVA INFRACT': {'YES': 1, 'NO': 0},
+        'PULMONARY EMBOLISM': {'YES': 1, 'NO': 0},
+        'TYPE OF ADMISSION-EMERGENCY/OPD' : {'EMERGENCY':'E', 'OPD': 'O'},
         'DM': {'YES': 1, 'NO': 0},
         'HTN': {'YES': 1, 'NO': 0},
-        'CAD': {'YES': 1, 'NO': 0},
-        'PRIOR_CMP': {'YES': 1, 'NO': 0},
-        'CKD': {'YES': 1, 'NO': 0},
-        'RAISED_CARDIAC_ENZYMES': {'YES': 1, 'NO': 0},
-        'SEVERE_ANAEMIA': {'YES': 1, 'NO': 0},
-        'ANAEMIA': {'YES': 1, 'NO': 0},
-        'STABLE_ANGINA': {'YES': 1, 'NO': 0},
-        'ACS': {'YES': 1, 'NO': 0},
-        'STEMI': {'YES': 1, 'NO': 0},
-        'ATYPICAL_CHEST_PAIN': {'YES': 1, 'NO': 0},
-        'HEART_FAILURE': {'YES': 1, 'NO': 0},
-        'HFREF': {'YES': 1, 'NO': 0},
-        'HFNEF': {'YES': 1, 'NO': 0},
-        'VALVULAR': {'YES': 1, 'NO': 0},
-        'CHB': {'YES': 1, 'NO': 0},
-        'SSS': {'YES': 1, 'NO': 0},
-        'AKI': {'YES': 1, 'NO': 0},
-        'CVA_INFRACT': {'YES': 1, 'NO': 0},
-        'CVA_BLEED': {'YES': 1, 'NO': 0},
-        'AF': {'YES': 1, 'NO': 0},
-        'VT': {'YES': 1, 'NO': 0},
-        'PSVT': {'YES': 1, 'NO': 0},
-        'CONGENITAL': {'YES': 1, 'NO': 0},
-        'UTI': {'YES': 1, 'NO': 0},
-        'NEURO_ARDIOGENIC_SYNCOPE': {'YES': 1, 'NO': 0},
-        'ORTHOSTATIC': {'YES': 1, 'NO': 0},
-        'INFECTIVE_ENDOCARDITIS': {'YES': 1, 'NO': 0},
-        'DVT': {'YES': 1, 'NO': 0},
-        'CARDIOGENIC_SHOCK': {'YES': 1, 'NO': 0},
-        'SHOCK': {'YES': 1, 'NO': 0},
-        'PULMONARY_EMBOLISM': {'YES': 1, 'NO': 0},
-        'CHEST_INFECTION': {'YES': 1, 'NO': 0},
-        'GENDER': {'MALE': 'M', 'FEMALE': 'F'},
-        'RURAL': {'RURAL': 'R', 'URBAN': 'U'},
-        'TYPE_OF_ADMISSION' : {'EMERGENCY':'E', 'OPD': 'O'}
+        'CARDIOGENIC SHOCK': {'YES': 1, 'NO': 0},
+        'SEVERE ANAEMIA': {'YES': 1, 'NO': 0}
     }
-    columns = [
-        'SMOKING ', 'ALCOHOL', 'DM', 'HTN', 'CAD', 'PRIOR CMP', 'CKD',
-        'RAISED_ARDIAC_ENZYMES', 'SEVERE_ANAEMIA', 'ANAEMIA', 'STABLE_ANGINA',
-        'ACS', 'STEMI', 'ATYPICAL_CHEST_PAIN', 'HEART_FAILURE', 'HFREF', 'HFNEF',
-        'VALVULAR', 'CHB', 'SSS', 'AKI', 'CVA_INFRACT', 'CVA_BLEED', 'AF', 'VT',
-        'PSVT', 'CONGENITAL', 'UTI', 'NEURO_CARDIOGENIC_SYNCOPE', 'ORTHOSTATIC',
-        'INFECTIVE_ENDOCARDITIS', 'DVT', 'CARDIOGENIC_SHOCK', 'SHOCK',
-        'PULMONARY_EMBOLISM', 'CHEST_INFECTION', 'GENDER', 'RURAL','TYPE_OF_ADMISSION'
-    ]
-    user_input = {}
-    for column in columns:
-        while True:
-            response = input(f"Enter value for {column} (Options: {', '.join(conversion_dict[column].keys())}): ").strip().upper()
-            if response in conversion_dict[column]:
-                user_input[column] = conversion_dict[column][response]
-                break
-            else:
-                print(f"Invalid input. Please enter one of the following options: {', '.join(conversion_dict[column].keys())}")
+    # columns = ['AGE', 'GENDER', 'SMOKING ', 'HEART FAILURE', 'AKI', 'CVA INFRACT',
+    #    'PULMONARY EMBOLISM', 'TYPE OF ADMISSION-EMERGENCY/OPD', 'DM', 'HTN',
+    #    'CARDIOGENIC SHOCK', 'SEVERE ANAEMIA', 'ALCOHOL', 'CAD', 'PRIOR CMP',
+    #    'CKD', 'RAISED CARDIAC ENZYMES', 'ANAEMIA', 'STABLE ANGINA', 'ACS',
+    #    'STEMI', 'ATYPICAL CHEST PAIN', 'HFREF', 'HB', 'TLC', 'PLATELETS',
+    #    'GLUCOSE', 'UREA', 'CREATININE', 'EF', 'RURAL', 'HFNEF', 'VALVULAR',
+    #    'CHB', 'SSS', 'CVA BLEED', 'AF', 'VT', 'PSVT', 'CONGENITAL', 'UTI',
+    #    'NEURO CARDIOGENIC SYNCOPE', 'ORTHOSTATIC', 'INFECTIVE ENDOCARDITIS',
+    #    'DVT', 'SHOCK', 'CHEST INFECTION']
+    columns = ['AGE', 'GENDER', 'RURAL', 'TYPE OF ADMISSION-EMERGENCY/OPD', 'SMOKING ',
+       'ALCOHOL', 'DM', 'HTN', 'CAD', 'PRIOR CMP', 'CKD', 'HB', 'TLC',
+       'PLATELETS', 'GLUCOSE', 'UREA', 'CREATININE', 'RAISED CARDIAC ENZYMES',
+       'EF', 'SEVERE ANAEMIA', 'ANAEMIA', 'STABLE ANGINA', 'ACS', 'STEMI',
+       'ATYPICAL CHEST PAIN', 'HEART FAILURE', 'HFREF', 'HFNEF', 'VALVULAR',
+       'CHB', 'SSS', 'AKI', 'CVA INFRACT', 'CVA BLEED', 'AF', 'VT', 'PSVT',
+       'CONGENITAL', 'UTI', 'NEURO CARDIOGENIC SYNCOPE', 'ORTHOSTATIC',
+       'INFECTIVE ENDOCARDITIS', 'DVT', 'CARDIOGENIC SHOCK', 'SHOCK',
+       'PULMONARY EMBOLISM', 'CHEST INFECTION']
 
-    for key, value in user_input.items():
-        print(f"{key}: {value}")
+
+    df = pd.DataFrame()
+    # user_input = {}
+    # for column in columns:
+    #     while True:
+    #         response = input(f"Enter value for {column} (Options: {', '.join(conversion_dict[column].keys())}): ").strip().upper()
+    #         if response in conversion_dict[column]:
+    #             user_input[column] = conversion_dict[column][response]
+    #             break
+    #         else:
+    #             print(f"Invalid input. Please enter one of the following options: {', '.join(conversion_dict[column].keys())}")
+
+    # for key, value in user_input.items():
+    #     print(f"{key}: {value}")
 
     additional_values = {
         'ALCOHOL': 0,
         'CAD': 1,
-        'PRIOR_CMP': 0,
+        'PRIOR CMP': 0,
         'CKD': 0,
-        'RAISED_CARDIAC_ENZYMES': 0,
+        'RAISED CARDIAC ENZYMES': 0,
         'ANAEMIA': 0,
-        'STABLE_ANGINA': 0,
+        'STABLE ANGINA': 0,
         'ACS': 0,
         'STEMI': 0,
-        'ATYPICAL_CHEST_PAIN': 0,
+        'ATYPICAL CHEST PAIN': 0,
         'HFREF': 0,
         'HB': 12.6,
         'TLC': 8.4,
@@ -128,22 +115,29 @@ def read_item(Gender: str, AGE: int, SMOKING: str, HEART_FAILURE: str,
         'CREATININE': 0.8,
         'EF': 60,
         'RURAL': 'U',
-        'DURATION_OF_STAY': 2,
         'HFNEF': 0,
         'VALVULAR': 0,
         'CHB': 0,
         'SSS': 0,
-        'CVA_BLEED': 0,
+        'CVA BLEED': 0,
         'AF': 0,
         'VT': 0,
         'PSVT': 0,
         'CONGENITAL': 0,
         'UTI': 0,
-        'NEURO_CARDIOGENIC_SYNCOPE': 0,
+        'NEURO CARDIOGENIC SYNCOPE': 0,
         'ORTHOSTATIC': 0,
-        'INFECTIVE_ENDOCARDITIS': 0,
+        'INFECTIVE ENDOCARDITIS': 0,
         'DVT': 0,
-        'SHOCK': 0
+        'SHOCK': 0,
+        'CHEST INFECTION': 0,
+        'PULMONARY EMBOLISM': 0,
+        'PRIOR CMP': 0,
+        'STABLE ANGINA': 0,
+        'HEART FAILURE': 1,
+        'RAISED CARDIAC ENZYMES': 1,
+        'CVA INFRACT': 0,
+        'NEURO CARDIOGENIC SYNCOPE': 0
     }
 
 
