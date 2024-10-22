@@ -105,7 +105,7 @@ def read_item(Gender: str, AGE: int, SMOKING: str, HEART_FAILURE: str,
         SEVERE_ANAEMIA = '1'
     else:
         SEVERE_ANAEMIA = '0'
-    
+
 
 
     summary = (
