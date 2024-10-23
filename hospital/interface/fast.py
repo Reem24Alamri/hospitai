@@ -144,7 +144,7 @@ def read_item(AGE: int, Gender: str, TYPE_OF_ADMISSION: str, UREA: float, TLC: f
 
     # Preprocessing the input
     X_proc = sk_learn_proc(df)[list(model.feature_names_in_)]
-    X_proc.to_csv('abd.csv')
+    #X_proc.to_csv('abd.csv')
 
     # Predicting with the model
 
