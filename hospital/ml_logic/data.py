@@ -26,7 +26,8 @@ def get_data_cleaned():
         'D.O.A',
         'D.O.D',
         'BNP',
-        'duration of intensive unit stay'
+        'duration of intensive unit stay',
+        'month year'
     ], inplace=True)
     df = df.replace('EMPTY',np.nan)
 
@@ -43,25 +44,7 @@ def get_data_cleaned():
     df = df[df['CHEST INFECTION'].isin(['1', '0'])]
     df['CHEST INFECTION'] = df['CHEST INFECTION'].astype('int')
 
-    # creation of sin and cos features
-    month_dict = {
-        'Jan':1,
-        'Feb':2,
-        'Mar':3,
-        'Apr':4,
-        'May':5,
-        'Jun':6,
-        'Jul':7,
-        'Aug':8,
-        'Sep':9,
-        'Oct':10,
-        'Nov':11,
-        'Dec':12
-    }
-    df['month_nb'] = df['month year'].apply(lambda x: month_dict[x[:3]])
-    months_in_a_year = 12
-    df['sin_admission'] = np.sin(2 * np.pi * (df['month_nb'] - 1) / months_in_a_year)
-    df['cos_admission'] = np.cos(2 * np.pi * (df['month_nb'] - 1) / months_in_a_year)
-    df.drop(columns=['month year', 'month_nb'], inplace=True)
+    X = df.drop(columns='DURATION OF STAY')
+    y = df['DURATION OF STAY']
 
-    return df
+    return (X, y)
