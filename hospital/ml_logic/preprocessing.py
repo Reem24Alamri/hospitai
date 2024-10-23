@@ -11,27 +11,6 @@ from sklearn.model_selection import cross_validate, cross_val_score,train_test_s
 
 def sk_learn_proc(X: pd.DataFrame):
 
-    # creation of sin and cos features
-    # month_dict = {
-    #     'Jan':1,
-    #     'Feb':2,
-    #     'Mar':3,
-    #     'Apr':4,
-    #     'May':5,
-    #     'Jun':6,
-    #     'Jul':7,
-    #     'Aug':8,
-    #     'Sep':9,
-    #     'Oct':10,
-    #     'Nov':11,
-    #     'Dec':12
-    # }
-    # X['month_nb'] = X['month year'].apply(lambda x: month_dict[x[:3]])
-    # months_in_a_year = 12
-    # X['sin_admission'] = np.sin(2 * np.pi * (X['month_nb'] - 1) / months_in_a_year)
-    # X['cos_admission'] = np.cos(2 * np.pi * (X['month_nb'] - 1) / months_in_a_year)
-    # X.drop(columns=['month year', 'month_nb'], inplace=True)
-
     num_transformer = RobustScaler()
     cat_transformer = OneHotEncoder(drop='if_binary', sparse_output=False)
 
@@ -47,10 +26,15 @@ def sk_learn_proc(X: pd.DataFrame):
     X_proc.rename(
         columns={
             'GENDER_M':'GENDER',
-            'RURAL_U':'RURAL',
-            'TYPE OF ADMISSION-EMERGENCY/OPD_O':'TYPE OF ADMISSION-EMERGENCY/OPD'
+            'RURAL_U':'RURAL'
         },
         inplace=True
     )
+
+    for col in X_proc.columns:
+        if col.startswith('TYPE OF ADMISSION-EMERGENCY/OPD'):
+            X_proc = X_proc.rename(columns={col: 'TYPE OF ADMISSION-EMERGENCY/OPD'})
+
+    X_proc = X_proc[sorted(X_proc.columns)]
 
     return X_proc
